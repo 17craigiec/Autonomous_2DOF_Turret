@@ -41,9 +41,10 @@ private:
 
 public:
 
-    Stepper(int pin0, int pin1, int pin2, int pin3, int direction);
+    Stepper(int pin0, int pin1, int pin2, int pin3);
     ~Stepper();
 
+    void inverseDirection();
     void setVelocity(double vel);
     void motorOff();
 

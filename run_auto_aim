@@ -1,9 +1,10 @@
 if [ ! -f cmake/auto_aim.exe ]; then
     echo "File: auto_aim.exe not found!"
     echo "Attempting to build..."
-    cd cmake
-    make
-    cd ../
 fi
+
+cd cmake
+make
+cd ../
 
 sudo cmake/auto_aim.exe

@@ -2,8 +2,8 @@
 
 using namespace std;
 
-// INPUTS ( pin #'s: 1-40 , direction: -1 || 1 )
-Stepper::Stepper(int pin0, int pin1, int pin2, int pin3, int direction)
+// INPUTS ( pin #'s: 1-40 )
+Stepper::Stepper(int pin0, int pin1, int pin2, int pin3)
 {
     wiringPiSetup();
     pinMode(pin0, OUTPUT);
@@ -18,7 +18,7 @@ Stepper::Stepper(int pin0, int pin1, int pin2, int pin3, int direction)
     m_pins.p3 = pin3;
 
     // Set direction orientation on construction
-    m_dir = direction;
+    m_dir = 1;
 
     m_internal_timer.reset();
 }
@@ -30,6 +30,11 @@ Stepper::~Stepper()
 void Stepper::setVelocity(double vel)
 {
     m_velocity = vel;
+}
+
+void Stepper::inverseDirection()
+{
+    m_dir = -1*m_dir;
 }
 
 void Stepper::pollStep()
