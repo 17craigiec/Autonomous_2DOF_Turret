@@ -2,7 +2,7 @@
 
 int main(int argc, char const *argv[])
 {
-    int TEST_PIN = 29;
+    int TEST_PIN = 0;
 
     wiringPiSetup();			    // Setup the library
     pinMode(TEST_PIN, OUTPUT);		// Configure GPIO0 as an output

@@ -6,8 +6,8 @@ class Turret
 {
 private:
     // Motor objects
-    Stepper m_yaw = Stepper(1, 2, 3, 4);
-    Stepper m_pitch = Stepper(5, 6, 7, 8);
+    Stepper m_yaw = Stepper(0, 7);
+    Stepper m_pitch = Stepper(2, 3);
     
 public:
     Turret();
@@ -15,4 +15,5 @@ public:
 
     void setVelocities(double yaw_vel, double pitch_vel);
     void advanceMotors();
+    void centerOnBlob(int cent_x, int cent_y);
 };

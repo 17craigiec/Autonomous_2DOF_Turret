@@ -3,22 +3,18 @@
 using namespace std;
 
 // INPUTS ( pin #'s: 1-40 )
-Stepper::Stepper(int pin0, int pin1, int pin2, int pin3)
+Stepper::Stepper(int direction_pin, int pulse_pin)
 {
     wiringPiSetup();
-    pinMode(pin0, OUTPUT);
-    pinMode(pin1, OUTPUT);
-    pinMode(pin2, OUTPUT);
-    pinMode(pin3, OUTPUT);
+    pinMode(direction_pin, OUTPUT);
+    pinMode(pulse_pin, OUTPUT);
 
-    // Associate pins with the private struct
-    m_pins.p0 = pin0;
-    m_pins.p1 = pin1;
-    m_pins.p2 = pin2;
-    m_pins.p3 = pin3;
+    // Associate pins
+    m_dir_pin = direction_pin;
+    m_pulse_pin = pulse_pin;
 
     // Set direction orientation on construction
-    m_dir = 1;
+    m_dir_offset = 1;
 
     m_internal_timer.reset();
 }
@@ -28,13 +24,18 @@ Stepper::~Stepper()
 }
 
 void Stepper::setVelocity(double vel)
-{
-    m_velocity = vel;
+{   
+    m_velocity = vel * m_dir_offset;
+
+    if(m_velocity != 0)
+    {
+        // cout << "velocity set... seconds per tick: " << 1/(abs(m_velocity)*(1/(2*pi))*TICKS_PER_ROTATION) << endl;
+    }
 }
 
-void Stepper::inverseDirection()
+void Stepper::inverseDirectionOffset()
 {
-    m_dir = -1*m_dir;
+    m_dir_offset = -1 * m_dir_offset;
 }
 
 void Stepper::pollStep()
@@ -48,18 +49,22 @@ void Stepper::pollStep()
 
         if(pollInternalTimer(seconds_per_tick))
         {
-            if(m_velocity > 0)
+            // Set the dir pin appropriately
+            if (m_velocity < 0)
             {
-                m_cycle_index++;
+                digitalWrite(m_dir_pin, 0);
+                // cout << "Pulse -1" << endl;
             }
             else
             {
-                m_cycle_index--;
+                digitalWrite(m_dir_pin, 1);
+                // cout << "Pulse 1" << endl;
             }
-            
-            m_cycle_index = m_cycle_index%m_cycle.size();
-            writePins();
-            cout << "Step: " << m_cycle_index << "   Target Time: " << seconds_per_tick << endl;
+
+            // Pulse the stepper
+            digitalWrite(m_pulse_pin, 1);
+            delay(0.001);
+            digitalWrite(m_pulse_pin, 0);
         }
     }
 }
@@ -75,50 +80,4 @@ bool Stepper::pollInternalTimer(double seconds_per_tick)
     }
 
     return time_exceeded;
-}
-
-void Stepper::writePins()
-{
-    for(int i = 0; i < 4; i++)
-    {
-        bool write_status = m_cycle[m_cycle_index][i];
-
-        switch(i)
-        {
-        case 0:
-            digitalWrite(m_pins.p0, write_status);
-            break;
-
-        case 1:
-            digitalWrite(m_pins.p1, write_status);
-            break;
-
-        case 2:
-            digitalWrite(m_pins.p2, write_status);
-            break;
-
-        case 3:
-            digitalWrite(m_pins.p3, write_status);
-            break;
-        
-        default:
-            cout << "ERROR: Indexed past writable pins" << endl;
-            break;
-        }
-
-        cout << write_status;
-    }
-
-    cout << endl;
-}
-
-void Stepper::motorOff()
-{
-    setVelocity(0);
-
-    bool write_status = false;
-    digitalWrite(m_pins.p0, write_status);
-    digitalWrite(m_pins.p1, write_status);
-    digitalWrite(m_pins.p2, write_status);
-    digitalWrite(m_pins.p3, write_status);
 }

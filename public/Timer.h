@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ctime>
 
+#define pass (void)0
+
 class Timer
 {
 public:
@@ -17,3 +19,13 @@ public:
 private:
     timespec beg_, end_;
 };
+
+// void sleep_tm(double ns){
+//     Timer my_timer;
+//     my_timer.reset();
+
+//     while (my_timer.elapsed() < ns)
+//     {
+//         pass;
+//     }
+// };
